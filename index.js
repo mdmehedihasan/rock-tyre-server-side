@@ -23,13 +23,22 @@ async function run() {
         //connect the client to the server
         await client.connect();
         const reviewCollection = client.db('rock_tyre').collection('review');
+        const productCollection = client.db('rock_tyre').collection('product');
 
-        //get
+        //get review
         app.get('/review', async (req, res) => {
             const query = (0);
             const cursor = reviewCollection.find(query);
             const reviews = await cursor.toArray();
             res.send(reviews);
+        });
+
+        //get product
+        app.get('/product', async (req, res) => {
+            const query = (0);
+            const cursor = productCollection.find(query);
+            const products = await cursor.toArray();
+            res.send(products);
         });
 
 
@@ -39,6 +48,12 @@ async function run() {
             const result = await reviewCollection.insertOne(newReview);
             res.send(result);
         });
+        //post product
+        app.post('/product', async (req, res) => {
+            const newProduct = req.body;
+            const result = await productCollection.insertOne(newProduct);
+            res.send(result);
+        })
     }
     finally {
 
