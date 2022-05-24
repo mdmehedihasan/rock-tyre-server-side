@@ -24,6 +24,13 @@ async function run() {
         await client.connect();
         const reviewCollection = client.db('rock_tyre').collection('review');
 
+        //get
+        app.get('/review', async (req, res) => {
+            const query = (0);
+            const cursor = reviewCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
+        });
 
 
         //Post review
