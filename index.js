@@ -26,6 +26,7 @@ async function run() {
         const reviewCollection = client.db('rock_tyre').collection('review');
         const productCollection = client.db('rock_tyre').collection('product');
         const orderCollection = client.db('rock_tyre').collection('order');
+        const userCollection = client.db('rock_tyre').collection('users');
 
 
         //get review
@@ -58,6 +59,18 @@ async function run() {
             const orders = await orderCollection.find(query).toArray();
             res.send(orders);
         });
+        //put for new user
+        app.put('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: user,
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+        })
 
 
         //Post review
