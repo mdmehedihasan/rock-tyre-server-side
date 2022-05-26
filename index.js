@@ -72,7 +72,15 @@ async function run() {
             const result = await userCollection.updateOne(filter, updateDoc, options);
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
             res.send({ result, token });
-        })
+        });
+
+        //get user info
+        app.get('/user', async (req, res) => {
+            const query = (0);
+            const cursor = userCollection.find(query);
+            const users = await cursor.toArray();
+            res.send(users);
+        });
 
 
         //Post review
