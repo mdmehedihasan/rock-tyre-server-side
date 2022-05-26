@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const query = require('express/lib/middleware/query');
 const port = process.env.PORT || 5000;
 const app = express();
 
@@ -24,6 +25,8 @@ async function run() {
         await client.connect();
         const reviewCollection = client.db('rock_tyre').collection('review');
         const productCollection = client.db('rock_tyre').collection('product');
+        const orderCollection = client.db('rock_tyre').collection('order');
+
 
         //get review
         app.get('/review', async (req, res) => {
@@ -47,7 +50,14 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const product = await productCollection.findOne(query);
             res.send(product);
-        })
+        });
+        //get order
+        app.get('/order', async (req, res) => {
+            const userEmail = req.query.userEmail;
+            const query = { userEmail: userEmail };
+            const orders = await orderCollection.find(query).toArray();
+            res.send(orders);
+        });
 
 
         //Post review
@@ -60,6 +70,12 @@ async function run() {
         app.post('/product', async (req, res) => {
             const newProduct = req.body;
             const result = await productCollection.insertOne(newProduct);
+            res.send(result);
+        });
+        //post order
+        app.post('/order', async (req, res) => {
+            const order = req.body;
+            const result = await orderCollection.insertOne(order);
             res.send(result);
         })
     }
