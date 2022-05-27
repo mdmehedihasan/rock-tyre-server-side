@@ -75,6 +75,17 @@ async function run() {
             const orders = await orderCollection.find(query).toArray();
             res.send(orders);
         });
+
+        //payment for specific id of order
+        app.get('/order/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const order = await orderCollection.findOne(query);
+            res.send(order);
+        })
+
+
+
         //only admin can get access the all user route
         app.get('/admin/:email', async (req, res) => {
             const email = req.params.email;
