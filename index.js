@@ -20,6 +20,21 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 //create a new mongo client
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+function verifyJWT(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ message: 'UnAuthorized access' });
+    }
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({ message: 'Forbidden access' })
+        }
+        req.decoded = decoded;
+        next();
+    });
+}
+
 async function run() {
     try {
         //connect the client to the server
@@ -74,17 +89,24 @@ async function run() {
             res.send({ result, token });
         });
         //put for admin user
-        app.put('/user/admin/:email', async (req, res) => {
+        app.put('/user/admin/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
+            const requester = req.decoded.email;
+            const requesterAccount = await userCollection.findOne({ email: requester });
+            if (requesterAccount.role === 'admin') {
+                const filter = { email: email };
 
-            const filter = { email: email };
+                const updateDoc = {
+                    $set: { role: 'admin' },
+                };
+                const result = await userCollection.updateOne(filter, updateDoc);
 
-            const updateDoc = {
-                $set: { role: 'admin' },
-            };
-            const result = await userCollection.updateOne(filter, updateDoc);
+                res.send(result);
+            }
+            else {
+                res.status(403).send({ message: 'forbidden' });
+            }
 
-            res.send(result);
         });
 
         //get user info
