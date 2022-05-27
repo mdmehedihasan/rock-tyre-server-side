@@ -137,6 +137,13 @@ async function run() {
             const result = await productCollection.insertOne(newProduct);
             res.send(result);
         });
+        //delete product by user by id
+        app.delete('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await productCollection.deleteOne(filter);
+            res.send(result);
+        });
         //post order
         app.post('/order', async (req, res) => {
             const order = req.body;
