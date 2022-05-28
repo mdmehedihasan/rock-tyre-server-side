@@ -78,6 +78,14 @@ async function run() {
             res.send(orders);
         });
 
+        //get all user order
+        app.get('/orders', async (req, res) => {
+            const query = (0);
+            const cursor = orderCollection.find(query);
+            const orders = await cursor.toArray();
+            res.send(orders);
+        });
+
         //payment for specific id of order
         app.get('/order/:id', async (req, res) => {
             const id = req.params.id;
@@ -181,6 +189,13 @@ async function run() {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
             const result = await productCollection.deleteOne(filter);
+            res.send(result);
+        });
+        //delete api for order delete
+        app.delete('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await orderCollection.deleteOne(filter);
             res.send(result);
         });
         //post order
