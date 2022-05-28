@@ -44,6 +44,7 @@ async function run() {
         const productCollection = client.db('rock_tyre').collection('product');
         const orderCollection = client.db('rock_tyre').collection('order');
         const userCollection = client.db('rock_tyre').collection('users');
+        const paymentCollection = client.db('rock_tyre').collection('payments');
 
 
         //get review
@@ -127,6 +128,21 @@ async function run() {
             }
 
         });
+        //patch for transaction id update
+        app.patch('/order/:id', verifyJWT, async (req, res) => {
+            const id = req.params.id;
+            const payment = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updatedDoc = {
+                $set: {
+                    paid: true,
+                    transactionId: payment.transactionId,
+                }
+            }
+            const result = await paymentCollection.insertOne(payment);
+            const updatedOrder = await orderCollection.updateOne(filter, updatedDoc);
+            res.send(updatedDoc);
+        })
 
         //get user info
         app.get('/user', async (req, res) => {
