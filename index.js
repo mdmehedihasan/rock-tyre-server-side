@@ -103,7 +103,7 @@ async function run() {
             const isAdmin = user.role === 'admin';
             res.send({ admin: isAdmin });
         })
-        //put for new user
+        //put for new user added
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body;
